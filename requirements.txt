@@ -1,0 +1,6 @@
+requests
+fake_useragent
+beautifulsoup4
+matplotlib
+jieba
+wordcloud
