@@ -1,5 +1,6 @@
 import tkinter as tk  # 引入套件
 from PIL import ImageTk, Image
+import webbrowser
 
 # 全域變數
 # 口味
@@ -180,7 +181,7 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
         # 圖片
         img_path = '../assets/' + str(number) + '.png'
         img_temp = Image.open(img_path)
-        resized_image = img_temp.resize((200,200))  # 改圖片尺寸
+        resized_image = img_temp.resize((300,300))  # 改圖片尺寸
         self.image = ImageTk.PhotoImage(resized_image)
         self.imglabel = tk.Label(self.firstWindow, image=self.image)
         self.imglabel.grid(row=3, column=0+more, columnspan=1, sticky=tk.W, pady=2)
@@ -215,12 +216,13 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
                                                         justify='left')
         self.ramenInfo3.grid(row=3, column=0, columnspan=1, sticky=tk.W)
         # 資訊：超連結
-        self.ramenInfo4 = tk.Label(self.newWindow, text='超連結：'+data_line[6])
+        self.ramenInfo4 = tk.Label(self.newWindow, text='參考資料：'+data_line[14])
+        self.ramenInfo4.bind("<Button-1>", lambda e: webbrowser.open_new(data_line[14]))
         self.ramenInfo4.grid(row=10, column=0, columnspan=1, sticky=tk.W)
         # 圖片放右邊
         cloud_path = '../wordclouds/' + str(number) + '.png'
-        cloud_temp = Image.open(cloud_path) 
-        resized_image = cloud_temp.resize((200,200))
+        cloud_temp = Image.open(cloud_path)
+        resized_image = cloud_temp.resize((300,300))
         self.cloud = ImageTk.PhotoImage(resized_image)
         self.label = tk.Label(self.newWindow, image=self.cloud)
         self.label.grid(row=1, column=1, rowspan=5, sticky=tk.E)
