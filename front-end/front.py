@@ -47,7 +47,7 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
 
         # 查詢按鈕
         # self.submitButton = tk.Button(self, text='送出查詢', height=2)
-        self.submitButton = tk.Button(self, command=self.return_result(), text='送出查詢', height=2)
+        self.submitButton = tk.Button(self, command = lambda: self.return_result(), text='送出查詢', height=2)
         self.submitButton.grid(row=20, column=1, columnspan=4, sticky=tk.NE + tk.SW, pady=5)
 
     # 產生一堆 checkbutton
@@ -72,9 +72,6 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
 
     # submitButton按下去跑出查詢結果
     def return_result(self):
-        # 查詢結果label
-        self.resultLabel = tk.Label(self, text='演算法結果', font=('TkDefaultFont', 16))
-        self.resultLabel.grid(row=22, column=0, columnspan=6, sticky=tk.W, pady=2)
         # 篩給演算法的資料
         check_flavor = self.true_checkbutton(flavor_list, 'flavor')
         check_district = self.true_checkbutton(district_list, 'district')
@@ -134,11 +131,26 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
                         if flavor == flavor_list[s]:
                             flavor_point += float(choose_line[14+s])
                 choose_list[i].append(flavor_point)
+                # 詳細資訊要的東西
+                choose_list[i].append(choose_line[2])  # 捷運站
+                choose_list[i].append(choose_line[6])  # 地址
+                choose_list[i].append(choose_line[7])  # 星期1
+                choose_list[i].append(choose_line[8])  # 星期2
+                choose_list[i].append(choose_line[9])  # 星期3
+                choose_list[i].append(choose_line[10])  # 星期4
+                choose_list[i].append(choose_line[11])  # 星期5
+                choose_list[i].append(choose_line[12])  # 星期6
+                choose_list[i].append(choose_line[13])  # 星期7
+                choose_list[i].append(choose_line[3])  # 地圖連結
         # choose_list裡每一個list中依照順序是店家編號、店名、評分、評論數、口味權重
         choose_list.sort(key=lambda x:(x[4],x[2],x[3]),reverse=True)
+        global final_choose
         final_choose = []
-        for i in range(3):
-            final_choose.append(choose_list[i])
+        for i in range(len(choose_list)):
+            if i == 3:
+                break
+            else:
+                final_choose.append(choose_list[i])
         return(final_choose)
 
     # 演算法算出來 全部的拉麵
@@ -147,45 +159,50 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
         # [[0編號, 1店名, 2評分, 3評分數, 4口味權重]]
         # 知道編號跟店名就好其他不重要
         # 如果return空list的話？？？
+        self.firstWindow = tk.Toplevel(self)
+        # 查詢結果label
+        self.resultLabel = tk.Label(self.firstWindow, text='演算法結果', font=('TkDefaultFont', 16))
+        self.resultLabel.grid(row=0, column=0, columnspan=6, sticky=tk.W, pady=2)
         if len(final_choose) == 0:
-            self.noneLabel = tk.Label(self, text='沒有條件符合的店家，請再試一次。')
+            self.noneLabel = tk.Label(self.firstWindow, text='沒有條件符合的店家，請再試一次。')
             self.noneLabel.grid(row=23, column=0, columnspan=6, sticky=tk.W, pady=2)
         else:
-            row_times = 0
+            times = 0
             for each_list in final_choose:
-                self.ramen_log(each_list[0], each_list[1], row_times)
-                row_times += 3
+                self.ramen_log(each_list[0], each_list[1], times)
+                times += 1
 
     # 各個拉麵印資料
-    def ramen_log(self, number, name, row):
+    def ramen_log(self, number, name, more):
         # 店名
-        self.resultLabel = tk.Label(self, text=name)
-        self.resultLabel.grid(row=23+row, column=0, columnspan=6, sticky=tk.W, pady=2)
+        self.resultLabel = tk.Label(self.firstWindow, text=name)
+        self.resultLabel.grid(row=2, column=0+more, columnspan=1, sticky=tk.W, pady=2)
         # 圖片
         img_path = '../assets/' + str(number) + '.png'
-        img_temp = Image.open(img_path) 
+        img_temp = Image.open(img_path)
         resized_image = img_temp.resize((200,200))  # 改圖片尺寸
         self.image = ImageTk.PhotoImage(resized_image)
-        self.imglabel = tk.Label(self, image=self.image)
-        self.imglabel.grid(row=24+row, column=0, columnspan=6, sticky=tk.W, pady=2)
+        self.imglabel = tk.Label(self.firstWindow, image=self.image)
+        self.imglabel.grid(row=3, column=0+more, columnspan=1, sticky=tk.W, pady=2)
         # 按鈕
-        self.moreInfo = tk.Button(self, command=self.ramen_info(number), text='點我看更多', height=2)
-        self.moreInfo.grid(row=25+row, column=0, columnspan=6, sticky=tk.W, pady=2)
+        self.moreInfo = tk.Button(self.firstWindow, command = lambda: self.ramen_info(number), text='點我看更多', height=2)
+        self.moreInfo.grid(row=4, column=0+more, columnspan=1, sticky=tk.W, pady=2)
 
     # 新視窗拉麵資訊
     def ramen_info(self, number):
-        with open('../data/ramen_data.csv', 'r', encoding='utf-8') as f:
-            line = f.readlines()
-            data_line = line[number].split(',')
+        for each_list in final_choose:
+            if each_list[0] == number:
+                data_line = each_list
+                break
         self.newWindow = tk.Toplevel(self)
         # 店名
-        self.ramenTitle = tk.Label(self.newWindow, text=data_line[0], font=('TkDefaultFont', 18))
-        self.ramenTitle.grid(row=0, column=0, columnspan=2, sticky=tk.NE + tk.SW, pady=5)
+        self.ramenTitle = tk.Label(self.newWindow, text=data_line[1], font=('TkDefaultFont', 18))
+        self.ramenTitle.grid(row=0, column=0, columnspan=2, sticky=tk.W, pady=5)
         # 資訊：捷運站
-        self.ramenInfo1 = tk.Label(self.newWindow, text='捷運站：'+data_line[2]+'站')
+        self.ramenInfo1 = tk.Label(self.newWindow, text='捷運站：'+data_line[5]+'站')
         self.ramenInfo1.grid(row=1, column=0, columnspan=1, sticky=tk.W)
         # 資訊：地址
-        self.ramenInfo2 = tk.Label(self.newWindow, text='地址：\n'+data_line[6])
+        self.ramenInfo2 = tk.Label(self.newWindow, text='地址：\n'+data_line[6], justify='left')
         self.ramenInfo2.grid(row=2, column=0, columnspan=1, sticky=tk.W)
         # 資訊：營業時間
         self.ramenInfo3 = tk.Label(self.newWindow, text='營業時間：\n星期一：'+data_line[7]
@@ -194,10 +211,11 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
                                                         + '\n星期四：'+data_line[10]
                                                         + '\n星期五：'+data_line[11]
                                                         + '\n星期六：'+data_line[12]
-                                                        + '\n星期日：'+data_line[13])
+                                                        + '\n星期日：'+data_line[13],
+                                                        justify='left')
         self.ramenInfo3.grid(row=3, column=0, columnspan=1, sticky=tk.W)
         # 資訊：超連結
-        self.ramenInfo4 = tk.Label(self.newWindow, text='捷運站：'+data_line[2])
+        self.ramenInfo4 = tk.Label(self.newWindow, text='超連結：'+data_line[6])
         self.ramenInfo4.grid(row=10, column=0, columnspan=1, sticky=tk.W)
         # 圖片放右邊
         cloud_path = '../wordclouds/' + str(number) + '.png'
