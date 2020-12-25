@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import tkinter as tk  # 引入套件
 from PIL import ImageTk, Image
 import webbrowser
@@ -161,6 +162,11 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
         # 知道編號跟店名就好其他不重要
         # 如果return空list的話？？？
         self.firstWindow = tk.Toplevel(self)
+
+        '''modify by 施加鈞'''
+        self.image_list,self.imglabel_list=[],[]
+        '''modify by 施加鈞'''
+        
         # 查詢結果label
         self.resultLabel = tk.Label(self.firstWindow, text='演算法結果', font=('TkDefaultFont', 16))
         self.resultLabel.grid(row=0, column=0, columnspan=6, sticky=tk.W, pady=2)
@@ -182,9 +188,13 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
         img_path = '../assets/' + str(number) + '.png'
         img_temp = Image.open(img_path)
         resized_image = img_temp.resize((300,300))  # 改圖片尺寸
-        self.image = ImageTk.PhotoImage(resized_image)
-        self.imglabel = tk.Label(self.firstWindow, image=self.image)
-        self.imglabel.grid(row=3, column=0+more, columnspan=1, sticky=tk.W, pady=2)
+        
+        '''modify by 施加鈞'''
+        self.image_list.append(ImageTk.PhotoImage(resized_image))
+        self.imglabel_list.append(tk.Label(self.firstWindow, image=self.image_list[more]))
+        self.imglabel_list[more].grid(row=3, column=0+more, columnspan=1, sticky=tk.W, pady=2)
+        '''modify by 施加鈞'''
+        
         # 按鈕
         self.moreInfo = tk.Button(self.firstWindow, command = lambda: self.ramen_info(number), text='點我看更多', height=2)
         self.moreInfo.grid(row=4, column=0+more, columnspan=1, sticky=tk.W, pady=2)
