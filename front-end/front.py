@@ -96,9 +96,8 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
     def algorithm(self, check_flavor, check_district, check_mrt):
         choose_list = []
         import copy
-        if len(check_district) == 0:
+        if (len(check_district) == 0) and (len(check_mrt) == 0):
             check_district = copy.deepcopy(district_list)
-        if len(check_mrt) == 0:
             check_mrt = copy.deepcopy(mrt_list)
         if len(check_flavor) == 0:
             check_flavor = copy.deepcopy(flavor_list)
@@ -108,9 +107,8 @@ class Ramen(tk.Frame):  # 繼承現存的window frame
             for i in f:
                 store_num += 1  # 給店家一個編號
                 line = i.split(',')
-                if line[1] not in check_district:
-                    continue
-                if line[2] not in check_mrt:
+                # 行政區、捷運站找聯集
+                if (line[1] not in check_district) and (line[2] not in check_mrt):
                     continue
                 choose_store = [store_num,line[0]]
                 choose_list.append(choose_store)
